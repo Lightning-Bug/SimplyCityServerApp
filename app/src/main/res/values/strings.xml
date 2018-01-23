@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">SimplyCityServerApp</string>
+
+    <string name="slogan"> We transport food as quickly as your girlfriend betrays you</string>
+    <string name="title_activity_home">Home</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+
+</resources>

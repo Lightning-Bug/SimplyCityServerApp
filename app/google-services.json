@@ -1,0 +1,99 @@
+{
+  "project_info": {
+    "project_number": "785557849720",
+    "firebase_url": "https://lets-do-it-dc1a0.firebaseio.com",
+    "project_id": "lets-do-it-dc1a0",
+    "storage_bucket": "lets-do-it-dc1a0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:785557849720:android:31fb9118e14148b7",
+        "android_client_info": {
+          "package_name": "com.android.parii.lets_do_it"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "785557849720-jihcejv4o9n18sbhja20dq90m9dp1f0l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.parii.lets_do_it",
+            "certificate_hash": "e295a1ca219d45c1f0aeb2100e2e6fc95c477455"
+          }
+        },
+        {
+          "client_id": "785557849720-qng154m9efpb043eq0t3gfhjod8p95vi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCL38H1xmXawCdY9zSB8vuw7EDL_Rj_Y5Y"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "785557849720-qng154m9efpb043eq0t3gfhjod8p95vi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:785557849720:android:9e276a646ced8eff",
+        "android_client_info": {
+          "package_name": "com.android.parii.simplycityserverapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "785557849720-mrcfd1807rk9jkdo5jfmlejusk9vqu18.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.parii.simplycityserverapp",
+            "certificate_hash": "e295a1ca219d45c1f0aeb2100e2e6fc95c477455"
+          }
+        },
+        {
+          "client_id": "785557849720-qng154m9efpb043eq0t3gfhjod8p95vi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCL38H1xmXawCdY9zSB8vuw7EDL_Rj_Y5Y"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "785557849720-qng154m9efpb043eq0t3gfhjod8p95vi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
