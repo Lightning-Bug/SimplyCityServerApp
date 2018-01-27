@@ -30,6 +30,9 @@
         <activity android:name=".FoodList" />
         <activity android:name=".OrderStatus"></activity>
         <activity android:name=".MenuActivity"></activity>
+        <activity android:name=".PhoneVerification"></activity>
+        <activity android:name=".OtpVerification"></activity>
+        <activity android:name=".FoodDetail"></activity>
     </application>
 
 </manifest>

@@ -73,7 +73,7 @@ public class SignIn extends AppCompatActivity {
                     {
                         if(user.getPassword().equals(localPassword))
                         {
-                            Toast.makeText(getBaseContext(),"Success Bro",Toast.LENGTH_LONG).show();
+                            //Toast.makeText(getBaseContext(),"Success Bro",Toast.LENGTH_LONG).show();
 
                             Intent login =new Intent(SignIn.this,Home.class);
                             Common.currentUser = user;
@@ -84,19 +84,19 @@ public class SignIn extends AppCompatActivity {
                             //success
                         }
                         else
-                            Toast.makeText(getBaseContext(),"wrong pass",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getBaseContext(),"Incorrect password",Toast.LENGTH_LONG).show();
 
 
                     }
                     else
                     {
-                        Toast.makeText(getBaseContext(),"Login with admin Account bro",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getBaseContext(),"Login with admin Account",Toast.LENGTH_LONG).show();
 
                     }
                 }
                 else {
                     mDialog.dismiss();
-                    Toast.makeText(getBaseContext(), "Doesnt Exist in database", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getBaseContext(), "Admin Doesnt Exist!!", Toast.LENGTH_LONG).show();
                 }
 
             }

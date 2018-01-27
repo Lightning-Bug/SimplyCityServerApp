@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SimplyCityServerApp.iml" filepath="$PROJECT_DIR$/SimplyCityServerApp.iml" />
+      <module fileurl="file://C:\Users\AVINASH\AndroidStudioProjects\SimplyCityServerApp\SimplyCityServerApp.iml" filepath="C:\Users\AVINASH\AndroidStudioProjects\SimplyCityServerApp\SimplyCityServerApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\AVINASH\AndroidStudioProjects\SimplyCityServerApp\app\app.iml" filepath="C:\Users\AVINASH\AndroidStudioProjects\SimplyCityServerApp\app\app.iml" />
     </modules>
   </component>
 </project>

@@ -58,7 +58,7 @@ public class FoodList extends AppCompatActivity {
     Button btnSelect,btnUpload;
     Food newFood;
 
-    Uri saveUri;
+    Uri saveUri, updateImageURI;
 
     String categoryId = "";
     FirebaseRecyclerAdapter<Food,FoodViewHolder> adapter;
@@ -79,7 +79,7 @@ public class FoodList extends AppCompatActivity {
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_food);
         recyclerView.setHasFixedSize(true);
-        layoutManager = new GridLayoutManager(this,2);
+        layoutManager = new GridLayoutManager(this,1);
         recyclerView.setLayoutManager(layoutManager);
 
         fab = (FloatingActionButton)findViewById(R.id.fab);
@@ -130,33 +130,31 @@ public class FoodList extends AppCompatActivity {
             }
         });
 
+        btnUpload.setVisibility(View.GONE);
+
 
         alertDialog.setView(add_menu_layout);
-        alertDialog.setIcon(R.drawable.ic_shopping_cart_black_24dp);
+        //alertDialog.setIcon(R.drawable.ic_shopping_cart_black_24dp);
 
 
         //buttons
-        alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+        alertDialog.setPositiveButton("ADD", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                dialog.dismiss();
-
                 //creating new category
 
-                if(newFood != null)
-                {
-                    foodRef.child(getIntent().getStringExtra("res_key")).child("restrauntMenuList").
-                            child(getIntent().getStringExtra("menu_key")).
-                            child("foodList")
-                            .child(""+adapter.getItemCount()).setValue(newFood);
-
+                if(saveUri!=null){
+                    uploadImage();
+                    dialog.dismiss();
+                }else{
+                    Toast.makeText(FoodList.this,"Select Image",Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
 
-        alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+        alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -193,6 +191,7 @@ public class FoodList extends AppCompatActivity {
 
                                     //added line
                                     mDialog.dismiss();
+
                                     newFood = new Food();
                                     newFood.setName(edtName.getText().toString());
                                     newFood.setDescription(edtDescription.getText().toString());
@@ -200,6 +199,16 @@ public class FoodList extends AppCompatActivity {
                                     newFood.setDiscount(edtDiscount.getText().toString());
                                     newFood.setImage(uri.toString());
                                     newFood.setMenuId("abcdef");
+
+                                    if(newFood != null)
+                                    {
+                                        foodRef.child(getIntent().getStringExtra("res_key")).child("restrauntMenuList").
+                                                child(getIntent().getStringExtra("menu_key")).
+                                                child("foodList")
+                                                .child(""+adapter.getItemCount()).setValue(newFood);
+
+                                    }
+
                                 }
                             });
                         }
@@ -229,13 +238,6 @@ public class FoodList extends AppCompatActivity {
 
     private void chooseImage() {
 
-       /* Intent intent = new Intent();
-        intent.setType("images/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent,"Select Picture"),PICK_IMAGE_REQUEST);
-
-*/
-
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/jpeg");
@@ -255,7 +257,7 @@ public class FoodList extends AppCompatActivity {
                 databaseReference
         ) {
             @Override
-            protected void populateViewHolder(FoodViewHolder viewHolder, Food model, int position) {
+            protected void populateViewHolder(FoodViewHolder viewHolder, final Food model, int position) {
 
                 viewHolder.food_name.setText(model.getName());
                 Picasso.with(getBaseContext())
@@ -266,6 +268,13 @@ public class FoodList extends AppCompatActivity {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
                         //late
+                        Intent intent = new Intent(FoodList.this,FoodDetail.class);
+                        intent.putExtra("foodName",model.getName());
+                        intent.putExtra("foodDescription",model.getDescription());
+                        intent.putExtra("foodDiscount",model.getDiscount());
+                        intent.putExtra("foodPrice",model.getPrice()+"");
+                        intent.putExtra("foodImage",model.getImage());
+                        startActivity(intent);
                     }
                 });
             }
@@ -285,6 +294,13 @@ public class FoodList extends AppCompatActivity {
                 && data != null && data.getData() != null )
         {
             saveUri = data.getData();
+            btnSelect.setText("Image Selected");
+        }
+
+        if(requestCode == 4 && resultCode == RESULT_OK
+                && data != null && data.getData() != null )
+        {
+            updateImageURI = data.getData();
             btnSelect.setText("Image Selected");
         }
 
@@ -310,9 +326,13 @@ public class FoodList extends AppCompatActivity {
 
     private void deleteFood(String key) {
         //foodList.child(key).removeValue();
+        foodRef.child(getIntent().getStringExtra("res_key")).child("restrauntMenuList").
+                child(getIntent().getStringExtra("menu_key")).
+                child("foodList")
+                .child(key).removeValue();
     }
 
-    private void changeImage(final Food item) {
+    private void changeImage(final String key) {
 
         if(saveUri != null)
         {
@@ -334,11 +354,23 @@ public class FoodList extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(Uri uri) {
 
-                                    //set value of category if image is uploaded , can get download link
-
-                                    //newCategory = new Category(edtName.getText().toString(),uri.toString());
-
+                                    Food item = new Food();
+                                    item.setName(edtName.getText().toString());
+                                    item.setPrice(edtPrice.getText().toString());
+                                    item.setDiscount(edtDiscount.getText().toString());
+                                    item.setDescription(edtDescription.getText().toString());
                                     item.setImage(uri.toString());
+                                    //added
+                                    Log.d("im at menu", "id");
+                                    item.setMenuId("ghg");
+
+
+                                    Log.d("im at menu", "id " + item.getMenuId() + ";" + key);
+                                    //foodList.child(key).setValue(item);
+                                    foodRef.child(getIntent().getStringExtra("res_key")).child("restrauntMenuList").
+                                            child(getIntent().getStringExtra("menu_key")).
+                                            child("foodList")
+                                            .child(key).setValue(item);
                                 }
                             });
                         }
@@ -357,11 +389,20 @@ public class FoodList extends AppCompatActivity {
 
                             //no error
                             double progress = (100.0 + taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                            mDialog.setMessage("Uplaoded "+progress+"%");
+                            mDialog.setMessage("Uplaoding ");
                         }
                     });
 
         }
+    }
+
+
+    private void updateImage() {
+
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/jpeg");
+        startActivityForResult(intent, 4);
     }
 
 
@@ -391,30 +432,24 @@ public class FoodList extends AppCompatActivity {
         btnSelect= add_menu_layout.findViewById(R.id.btnSelect);
         btnUpload= add_menu_layout.findViewById(R.id.btnUpload);
 
+        btnUpload.setVisibility(View.GONE);
+
 
         //events for buttons
         btnSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                chooseImage();
+                updateImage();
             }
         });
-
-        btnUpload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                changeImage(item);
-            }
-        });
-
 
         alertDialog.setView(add_menu_layout);
-        alertDialog.setIcon(R.drawable.ic_shopping_cart_black_24dp);
+        //alertDialog.setIcon(R.drawable.ic_shopping_cart_black_24dp);
 
 
         //buttons
-        alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+        alertDialog.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -423,28 +458,37 @@ public class FoodList extends AppCompatActivity {
                 //creating new category
 
 
+                if(btnSelect.getText().toString().equalsIgnoreCase("Image Selected")){
+                    if(updateImageURI!=null){
+                        saveUri = updateImageURI;
+                        changeImage(key);
+                    }
+                }else {
+
+
                     item.setName(edtName.getText().toString());
                     item.setPrice(edtPrice.getText().toString());
                     item.setDiscount(edtDiscount.getText().toString());
                     item.setDescription(edtDescription.getText().toString());
 
                     //added
-                Log.d("im at menu","id");
+                    Log.d("im at menu", "id");
                     item.setMenuId("ghg");
 
 
-                Log.d("im at menu","id "+ item.getMenuId()+";"+key);
+                    Log.d("im at menu", "id " + item.getMenuId() + ";" + key);
                     //foodList.child(key).setValue(item);
-                foodRef.child(getIntent().getStringExtra("res_key")).child("restrauntMenuList").
-                        child(getIntent().getStringExtra("menu_key")).
-                        child("foodList")
-                        .child(key).setValue(item);
+                    foodRef.child(getIntent().getStringExtra("res_key")).child("restrauntMenuList").
+                            child(getIntent().getStringExtra("menu_key")).
+                            child("foodList")
+                            .child(key).setValue(item);
 
+                }
 
             }
         });
 
-        alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+        alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 

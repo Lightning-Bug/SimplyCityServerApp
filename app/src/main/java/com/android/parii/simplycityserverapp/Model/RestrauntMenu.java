@@ -9,14 +9,16 @@ import java.util.List;
 public class RestrauntMenu {
 
     String menueName;
+    String imageURL;
     String menueID;
 
     List<Food> foodList;
 
     public RestrauntMenu(){}
 
-    public RestrauntMenu(String menueName ,String menueID){
+    public RestrauntMenu(String menueName ,String imageURL, String menueID){
         this.menueName = menueName;
+        this.imageURL = imageURL;
         this.menueID = menueID;
     }
 
@@ -26,6 +28,14 @@ public class RestrauntMenu {
 
     public String getMenueName(){
         return this.menueName;
+    }
+
+    public void setImageURL(String imageURL){
+        this.imageURL = imageURL;
+    }
+
+    public String getImageURL(){
+        return this.imageURL;
     }
 
     public void setMenueID(String menueID){

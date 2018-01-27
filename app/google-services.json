@@ -59,6 +59,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "785557849720-3u53nohh0l9h5ml4e12qaqfktja35hcm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.parii.simplycityserverapp",
+            "certificate_hash": "ae79e684fd27ad562f167111ba88ae82553a436e"
+          }
+        },
+        {
           "client_id": "785557849720-mrcfd1807rk9jkdo5jfmlejusk9vqu18.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

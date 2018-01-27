@@ -19,15 +19,6 @@
         style="@style/Base.ThemeOverlay.AppCompat.Light"
         tools:ignore="UseCompoundDrawables">
 
-        <TextView
-            android:gravity="center"
-            android:id="@+id/txtSlogan"
-            android:textColor="@android:color/white"
-            android:text="@string/slogan"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content" />
-
-
 
     </LinearLayout>
 

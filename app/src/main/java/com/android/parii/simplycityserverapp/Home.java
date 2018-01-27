@@ -35,6 +35,7 @@ import com.android.parii.simplycityserverapp.ViewHolder.MenuViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -74,7 +75,7 @@ public class Home extends AppCompatActivity
 
     Restaurant newRestaurant;
 
-    Uri saveUri;
+    Uri saveUri, updateImageURI;
     private  final int PICK_IMAGE_REQUEST = 71;
 
 
@@ -120,7 +121,7 @@ public class Home extends AppCompatActivity
         //name in header
         View headerView = navigationView.getHeaderView(0);
         txtFullName = (TextView)headerView.findViewById(R.id.txtFullName);
-        txtFullName.setText(Common.currentUser.getName());
+        //txtFullName.setText(Common.currentUser.getName());
 
 
         recycler_menu = (RecyclerView) findViewById(R.id.recycler_menu);
@@ -160,29 +161,28 @@ public class Home extends AppCompatActivity
             }
         });
 
+        btnUpload.setVisibility(View.GONE);
 
         alertDialog.setView(add_menu_layout);
-        alertDialog.setIcon(R.drawable.ic_shopping_cart_black_24dp);
+        //alertDialog.setIcon(R.drawable.ic_shopping_cart_black_24dp);
 
 
         //buttons
-        alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+        alertDialog.setPositiveButton("ADD", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                dialog.dismiss();
-
-                //creating new category
-
-                if(newRestaurant != null)
-                {
-                    categories.push().setValue(newRestaurant);
+                if(saveUri!=null) {
+                    uploadImage();
+                    dialog.dismiss();
+                }else{
+                    Toast.makeText(Home.this,"Select image",Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
 
-        alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+        alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -198,7 +198,8 @@ public class Home extends AppCompatActivity
         if(saveUri != null)
         {
             final ProgressDialog mDialog = new ProgressDialog(this);
-            mDialog.setMessage("Uploading.....");
+            mDialog.setMessage("Uploading...");
+            mDialog.setCancelable(false);
             mDialog.show();
 
             String imageName = UUID.randomUUID().toString();
@@ -210,24 +211,17 @@ public class Home extends AppCompatActivity
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
                             mDialog.dismiss();
-                            Toast.makeText(Home.this,"Uploaded....",Toast.LENGTH_LONG).show();
+                            //Toast.makeText(Home.this,"Uploaded",Toast.LENGTH_LONG).show();
                             imageFolder.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
                                 public void onSuccess(Uri uri) {
 
-                                    //set value of category if image is uploaded , can get download link
-
-                                    //added line
                                     mDialog.dismiss();
-                                    //ArrayList<Food> foodArrayList = new ArrayList<>();
-                                    //foodArrayList.add(new Food("afa","wefwae","faf","efw","wegfwae","efgaw"));
                                     ArrayList<RestrauntMenu> restrauntMenus = new ArrayList<>();
-                                    //RestrauntMenu restrauntMenu = new RestrauntMenu();
-                                    //restrauntMenu.setFoodList(foodArrayList);
-                                    //restrauntMenu.setMenueID("01");
-                                    //restrauntMenu.setMenueName("kulcha");
-                                    //restrauntMenus.add(restrauntMenu);
-                                    newRestaurant = new Restaurant(edtName.getText().toString()+"","01",uri.toString(),restrauntMenus);
+                                    newRestaurant = new Restaurant(edtName.getText().toString()+"",
+                                            "01",uri.toString(),restrauntMenus);
+
+                                    categories.push().setValue(newRestaurant);
 
                                 }
                             });
@@ -247,17 +241,68 @@ public class Home extends AppCompatActivity
 
                             //no error
                             double progress = (100.0 + taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                            mDialog.setMessage("Uplaoded "+progress+"%");
+                            mDialog.setMessage("Uplaoding");
                         }
                     });
-
-
 
         }
     }
 
 
+    private void uploadImage(final String key) {
 
+        if(saveUri != null)
+        {
+            final ProgressDialog mDialog = new ProgressDialog(this);
+            mDialog.setMessage("Uploading...");
+            mDialog.setCancelable(false);
+            mDialog.show();
+
+            String imageName = UUID.randomUUID().toString();
+            final StorageReference imageFolder = storageReference.child("images/"+imageName);
+
+            imageFolder.putFile(saveUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                            mDialog.dismiss();
+                            //Toast.makeText(Home.this,"Uploaded",Toast.LENGTH_LONG).show();
+                            imageFolder.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+
+                                    mDialog.dismiss();
+
+                                    Restaurant restaurant = new Restaurant();
+                                    restaurant.setName(edtName.getText().toString());
+                                    restaurant.setImageURL(uri.toString());
+                                    categories.child(key).setValue(restaurant);
+
+                                }
+                            });
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+
+                            mDialog.dismiss();
+                            Toast.makeText(Home.this,""+e.getMessage(),Toast.LENGTH_LONG).show();
+                        }
+                    })
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+
+                            //no error
+                            double progress = (100.0 + taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                            mDialog.setMessage("Uplaoding");
+                        }
+                    });
+
+        }
+    }
 
     //ctrl+o
     @Override
@@ -272,21 +317,29 @@ public class Home extends AppCompatActivity
             btnSelect.setText("Image Selected");
         }
 
+        if(requestCode == 4 && resultCode == RESULT_OK
+                && data != null && data.getData() != null )
+        {
+            updateImageURI = data.getData();
+            btnSelect.setText("Image Selected");
+        }
+
     }
 
     private void chooseImage() {
-
-       /* Intent intent = new Intent();
-        intent.setType("images/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent,"Select Picture"),PICK_IMAGE_REQUEST);
-
-*/
 
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/jpeg");
         startActivityForResult(intent, 5);
+    }
+
+    private void updateImage() {
+
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/jpeg");
+        startActivityForResult(intent, 4);
     }
 
     private void loadMenu() {
@@ -369,9 +422,11 @@ public class Home extends AppCompatActivity
             Intent j = new Intent(Home.this,OrderStatus.class);
             startActivity(j);
 
+        }if(id == R.id.nav_sign_out){
+            FirebaseAuth.getInstance().signOut();
+            startActivity(new Intent(Home.this,MainActivity.class));
+            finish();
         }
-
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -422,7 +477,7 @@ public class Home extends AppCompatActivity
 
 
         categories.child(key).removeValue();
-        Toast.makeText(Home.this,"Deleted Broo :( !!!",Toast.LENGTH_LONG).show();
+        Toast.makeText(Home.this,"Item Deleted",Toast.LENGTH_LONG).show();
     }
 
     private void showUpdateDialog(final String key, final Restaurant restaurant) {
@@ -431,6 +486,7 @@ public class Home extends AppCompatActivity
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(Home.this);
         alertDialog.setTitle("Update Info");
         alertDialog.setMessage("Please Fill Full info");
+
 
         final LayoutInflater inflater = this.getLayoutInflater();
         View add_menu_layout = inflater.inflate(R.layout.add_new_menu_layout,null);
@@ -447,8 +503,7 @@ public class Home extends AppCompatActivity
         btnSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                chooseImage();
+                updateImage();
             }
         });
 
@@ -458,35 +513,33 @@ public class Home extends AppCompatActivity
                 changeImage(restaurant);
             }
         });
-
+        btnUpload.setVisibility(View.GONE);
 
         alertDialog.setView(add_menu_layout);
-        alertDialog.setIcon(R.drawable.ic_shopping_cart_black_24dp);
+        //alertDialog.setIcon(R.drawable.ic_shopping_cart_black_24dp);
 
 
         //buttons
-        alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+        alertDialog.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
                 dialog.dismiss();
 
-                restaurant.setName(edtName.getText().toString());
-                categories.child(key).setValue(restaurant);
-
-
-                //creating new category
-
-                /*if(newCategory != null)
-                {
-                    categories.push().setValue(newCategory);
+                if(btnSelect.getText().toString().equalsIgnoreCase("Image Selected")){
+                    if(updateImageURI!=null){
+                        saveUri = updateImageURI;
+                        uploadImage(key);
+                    }
+                }else{
+                    restaurant.setName(edtName.getText().toString());
+                    categories.child(key).setValue(restaurant);
                 }
-                */
 
             }
         });
 
-        alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+        alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -515,7 +568,7 @@ public class Home extends AppCompatActivity
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
                             mDialog.dismiss();
-                            Toast.makeText(Home.this,"Uploaded....",Toast.LENGTH_LONG).show();
+                            Toast.makeText(Home.this,"Uploaded",Toast.LENGTH_LONG).show();
                             imageFolder.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
                                 public void onSuccess(Uri uri) {
